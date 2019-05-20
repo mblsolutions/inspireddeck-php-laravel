@@ -1,0 +1,42 @@
+{
+    "name": "mblsolutions/inspireddeck-php-laravel",
+    "description": "Official Inspired Deck interface for Laravel PHP applications.",
+    "keywords": ["inspiredsuite", "inspireddeck", "giftcard", "e-gift", "laravel"],
+    "type": "package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MBL Solutions Ltd.",
+            "email": "support@mblsolutions.co.uk"
+        }
+    ],
+    "require": {
+        "illuminate/routing": "^5.5.0",
+        "illuminate/support": "^5.5.0",
+        "illuminate/session": "^5.5.0",
+        "mblsolutions/inspireddeck-php": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MBLSolutions\\InspiredDeckLaravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MBLSolutions\\": "tests",
+            "MBLSolutions\\InspiredDeckLaravel\\Tests\\": "tests/InspiredDeckLaravel"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MBLSolutions\\InspiredDeckLaravel\\InspiredDeckServiceProvider"
+            ]
+        }
+    }
+}
