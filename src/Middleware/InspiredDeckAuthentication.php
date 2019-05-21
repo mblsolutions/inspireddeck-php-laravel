@@ -4,6 +4,7 @@ namespace MBLSolutions\InspiredDeckLaravel\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use MBLSolutions\InspiredDeck\InspiredDeck;
 use MBLSolutions\InspiredDeckLaravel\Authentication;
 use MBLSolutions\InspiredDeckLaravel\Exceptions\AuthenticationException;
 
@@ -29,6 +30,10 @@ class InspiredDeckAuthentication
         if (!$request->session()->has($this->authentication->sessionKey)) {
             throw new AuthenticationException(401);
         }
+
+        $auth = $this->authentication->get();
+
+        InspiredDeck::setToken($auth['access_token']);
 
         return $next($request);
     }

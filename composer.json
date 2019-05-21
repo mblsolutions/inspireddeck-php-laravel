@@ -36,7 +36,10 @@
         "laravel": {
             "providers": [
                 "MBLSolutions\\InspiredDeckLaravel\\InspiredDeckServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "InspiredDeckAuth": "\\MBLSolutions\\InspiredDeckLaravel\\InspiredDeckAuthFacade"
+            }
         }
     }
 }

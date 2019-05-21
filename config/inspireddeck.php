@@ -11,7 +11,7 @@ return [
     |
     */
 
-    'endpoint' => env('DECK_URI', 'https://inspireddeck.co.uk'),
+    'endpoint' => env('ID_ENDPOINT', 'https://inspireddeck.co.uk'),
 
     /*
     |--------------------------------------------------------------------------
@@ -23,7 +23,7 @@ return [
     |
     */
 
-    'client_id' => env('DECK_CLIENT_ID', null),
+    'client_id' => env('ID_CLIENT_ID', null),
 
     /*
     |--------------------------------------------------------------------------
