@@ -11,9 +11,11 @@
         }
     ],
     "require": {
+        "ext-json": "*",
         "illuminate/routing": "^5.5.0",
         "illuminate/support": "^5.5.0",
         "illuminate/session": "^5.5.0",
+        "illuminate/pagination": "^5.5.0",
         "mblsolutions/inspireddeck-php": "dev-master"
     },
     "require-dev": {
@@ -26,8 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "MBLSolutions\\": "tests",
-            "MBLSolutions\\InspiredDeckLaravel\\Tests\\": "tests/InspiredDeckLaravel"
+            "MBLSolutions\\InspiredDeckLaravel\\Tests\\": "tests"
         }
     },
     "minimum-stability": "dev",
