@@ -12,10 +12,10 @@
     ],
     "require": {
         "ext-json": "*",
-        "illuminate/routing": "^5.5.0",
-        "illuminate/support": "^5.5.0",
-        "illuminate/session": "^5.5.0",
-        "illuminate/pagination": "^5.5.0",
+        "illuminate/routing": "~5.6.0|~5.7.0|~5.8.0|^6.0",
+        "illuminate/support": "~5.6.0|~5.7.0|~5.8.0|^6.0",
+        "illuminate/session": "~5.6.0|~5.7.0|~5.8.0|^6.0",
+        "illuminate/pagination": "~5.6.0|~5.7.0|~5.8.0|^6.0",
         "mblsolutions/inspireddeck-php": "dev-master"
     },
     "require-dev": {
