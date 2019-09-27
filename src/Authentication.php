@@ -101,7 +101,7 @@ class Authentication
         $role = $response['user']['role'] ?? null;
 
         if (!in_array($role, $this->validRoles, true)) {
-            throw new InvalidUserRoleException(403);
+            throw new InvalidUserRoleException(403, 'Your user role does not have permission for this action');
         }
 
         return true;
