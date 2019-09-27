@@ -65,7 +65,7 @@ return [
         'customer_service_operator',
         'store_manager',
         'store_operator',
-        //'report',
+        'report',
     ]
 
 ];

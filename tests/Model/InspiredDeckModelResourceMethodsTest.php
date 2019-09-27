@@ -13,7 +13,7 @@ class InspiredDeckModelResourceMethodsTest extends TestCase
     protected $brand;
 
     /** {@inheritdoc} **/
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
