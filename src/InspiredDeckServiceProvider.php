@@ -33,6 +33,7 @@ class InspiredDeckServiceProvider extends ServiceProvider
     {
         $this->app->singleton(InspiredDeck::class, static function () {
             InspiredDeck::setBaseUri(config('inspireddeck.endpoint'));
+            InspiredDeck::setVerifySSL(config('inspireddeck.verify_ssl', true));
 
             return new InspiredDeck;
         });
