@@ -18,7 +18,9 @@ return [
     | Inspired Deck Verify SSL
     |--------------------------------------------------------------------------
     |
-    | Verify SSL certificates via API calls
+    | Verify SSL certificates via API calls. We do not recommend disabling
+    | this for security reasons. This should only be adjusted when developing
+    | locally using a self signed SSL certificate.
     |
     */
 
