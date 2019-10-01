@@ -2,6 +2,7 @@
 
 namespace MBLSolutions\InspiredDeckLaravel\Tests\Unit;
 
+use Illuminate\Support\Facades\Auth;
 use MBLSolutions\InspiredDeck\Authentication as InspiredDeckAuthentication;
 use MBLSolutions\InspiredDeckLaravel\Authentication;
 use MBLSolutions\InspiredDeckLaravel\Exceptions\InvalidUserRoleException;
@@ -140,6 +141,42 @@ class AuthenticationTest extends LaravelTestCase
         $authentication->logout();
 
         $this->assertNull(session()->get('inspireddeck_auth_session'));
+    }
+
+    /** @test **/
+    public function can_check_if_authentication_session_exists(): void
+    {
+        $response = [
+            'token_type' => 'Bearer',
+            'expires_in' => 31622400,
+            'access_token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjBmOGMwNDAxZDAy',
+            'refresh_token' => 'def5020002eca9ac7875d5d800c195024d7fb702535c0d30a0',
+            'user' => [
+                'name' => 'John Doe',
+                'email' => 'john.doe@example.com',
+                'role' => 'programme_manager'
+            ]
+        ];
+
+        session()->put('inspireddeck_auth_session', $response);
+
+        $authentication = new Authentication();
+
+        $this->assertTrue($authentication->isAuthenticated());
+    }
+
+    /** @test **/
+    public function authentication_must_have_a_valid_structure(): void
+    {
+        $response = [
+            'success' => true
+        ];
+
+        session()->put('inspireddeck_auth_session', $response);
+
+        $authentication = new Authentication();
+
+        $this->assertFalse($authentication->isAuthenticated());
     }
 
 }

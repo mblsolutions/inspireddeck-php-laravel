@@ -107,4 +107,35 @@ class Authentication
         return true;
     }
 
+    /**
+     * Check if current user is authenticated
+     *
+     * @return bool
+     */
+    public function isAuthenticated(): bool
+    {
+        $auth = Session::get($this->sessionKey);
+
+        return $this->validateAuthentication($auth);
+    }
+
+    /**
+     * Validate Authentication
+     *
+     * @param null $auth
+     * @return bool
+     */
+    private function validateAuthentication($auth = null): bool
+    {
+        $matchingKeys = [
+            'token_type',
+            'expires_in',
+            'access_token',
+            'refresh_token',
+            'user'
+        ];
+
+        return $auth && array_keys($auth) === $matchingKeys;
+    }
+
 }

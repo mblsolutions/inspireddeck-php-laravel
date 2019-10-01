@@ -64,9 +64,10 @@ class InspiredDeckServiceProvider extends ServiceProvider
      *
      * @param $request
      * @param Exception $exception
+     * @param callable|null $function
      * @return JsonResponse|RedirectResponse
      */
-    public static function exceptionHandling($request, Exception $exception)
+    public static function exceptionHandling($request, Exception $exception, callable $function = null)
     {
         if (route_contains('async') || route_contains('api')) {
             if ($exception instanceof ValidationException) {
@@ -94,6 +95,8 @@ class InspiredDeckServiceProvider extends ServiceProvider
         if ($exception instanceof ValidationException) {
             return redirect()->back()->withInput()->withErrors($exception->getValidationErrors());
         }
+
+        return $function();
     }
 
 }
