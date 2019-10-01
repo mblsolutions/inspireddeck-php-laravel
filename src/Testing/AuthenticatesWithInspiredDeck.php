@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace MBLSolutions\InspiredDeckLaravel\Testing;
 
 use MBLSolutions\InspiredDeckLaravel\Authentication;
 
