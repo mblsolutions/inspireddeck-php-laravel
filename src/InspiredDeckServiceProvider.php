@@ -2,10 +2,17 @@
 
 namespace MBLSolutions\InspiredDeckLaravel;
 
+use Exception;
 use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\ServiceProvider;
+use MBLSolutions\InspiredDeck\Exceptions\NotFoundException;
+use MBLSolutions\InspiredDeck\Exceptions\PermissionDeniedException;
+use MBLSolutions\InspiredDeck\Exceptions\ValidationException;
 use MBLSolutions\InspiredDeck\InspiredDeck;
 use MBLSolutions\InspiredDeckLaravel\Middleware\LoadInspiredDeckConfig;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class InspiredDeckServiceProvider extends ServiceProvider
 {
@@ -50,6 +57,43 @@ class InspiredDeckServiceProvider extends ServiceProvider
         $kernel = $this->app[Kernel::class];
 
         $kernel->pushMiddleware($middleware);
+    }
+
+    /**
+     * Inspired Deck Exception Handling
+     *
+     * @param $request
+     * @param Exception $exception
+     * @return JsonResponse|RedirectResponse
+     */
+    public static function exceptionHandling($request, Exception $exception)
+    {
+        if (route_contains('async') || route_contains('api')) {
+            if ($exception instanceof ValidationException) {
+                return JsonResponse::create([
+                    'message' => $exception->getMessage(),
+                    'errors' => $exception->getValidationErrors()
+                ], $exception->getCode());
+            }
+        }
+
+        if ($exception instanceof HttpException) {
+            if ($exception->getStatusCode() === 401) {
+                return redirect()->route('login')->withErrors(['Please login to proceed.']);
+            }
+        }
+
+        if ($exception instanceof PermissionDeniedException) {
+            abort(403);
+        }
+
+        if ($exception instanceof NotFoundException) {
+            abort(404);
+        }
+
+        if ($exception instanceof ValidationException) {
+            return redirect()->back()->withInput()->withErrors($exception->getValidationErrors());
+        }
     }
 
 }
