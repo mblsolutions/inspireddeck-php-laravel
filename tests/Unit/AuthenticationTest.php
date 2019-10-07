@@ -2,7 +2,6 @@
 
 namespace MBLSolutions\InspiredDeckLaravel\Tests\Unit;
 
-use Illuminate\Support\Facades\Auth;
 use MBLSolutions\InspiredDeck\Authentication as InspiredDeckAuthentication;
 use MBLSolutions\InspiredDeckLaravel\Authentication;
 use MBLSolutions\InspiredDeckLaravel\Exceptions\InvalidUserRoleException;
@@ -178,5 +177,6 @@ class AuthenticationTest extends LaravelTestCase
 
         $this->assertFalse($authentication->isAuthenticated());
     }
+
 
 }

@@ -4,38 +4,22 @@ namespace MBLSolutions\InspiredDeckLaravel;
 
 class InspiredDeckAuthentication
 {
-    /** @var string $name */
-    public $name;
+    /** @var array $user */
+    protected $user;
 
-    /** @var string $email */
-    public $email;
-
-    /** @var string $role */
-    public $role;
+    /** @var InspiredDeckAuth $authentcation */
+    protected $authentication;
 
     /**
      * Inspired Deck Authentication
-     */
-    public function __construct()
-    {
-        $auth = (new Authentication())->get();
-
-        $this->loadUser($auth['user']);
-    }
-
-    /**
-     * Load User
      *
-     * @param array $user
-     * @return InspiredDeckAuthentication
+     * @param InspiredDeckAuth $authentication
      */
-    private function loadUser(array $user): self
+    public function __construct(InspiredDeckAuth $authentication = null)
     {
-        $this->name = $user['name'] ?? null;
-        $this->email = $user['email'] ?? null;
-        $this->role = $user['role'] ?? null;
+        $this->authentication = $authentication ?: new Authentication;
 
-        return $this;
+        $this->loadUser();
     }
 
     /**
@@ -43,9 +27,9 @@ class InspiredDeckAuthentication
      *
      * @return string
      */
-    public function getName(): string
+    public function getName(): ?string
     {
-        return $this->name;
+        return $this->user['name'];
     }
 
     /**
@@ -53,9 +37,9 @@ class InspiredDeckAuthentication
      *
      * @return string
      */
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
-        return $this->email;
+        return $this->user['email'];
     }
 
     /**
@@ -63,9 +47,48 @@ class InspiredDeckAuthentication
      *
      * @return string
      */
-    public function getRole(): string
+    public function getRole(): ?string
     {
-        return $this->role;
+        return $this->user['role'];
     }
+
+    /**
+     * Check if user has role
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->getRole() === $role;
+    }
+
+    /**
+     * Check if user has one of the supplied roles
+     *
+     * @param array $roles
+     * @return bool
+     */
+    public function hasRoles(array $roles): bool
+    {
+        return in_array($this->getRole(), $roles, true);
+    }
+
+    /**
+     * Load User
+     *
+     * @param string $key
+     * @return InspiredDeckAuthentication
+     */
+    private function loadUser($key = 'user'): self
+    {
+        $auth = $this->authentication->get();
+
+        $this->user = $key ? $auth[$key] : $auth;
+
+        return $this;
+    }
+
+
 
 }

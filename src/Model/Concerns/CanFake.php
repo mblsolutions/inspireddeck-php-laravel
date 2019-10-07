@@ -7,7 +7,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use MBLSolutions\InspiredDeck\Api\ApiRequestor;
-use MBLSolutions\InspiredDeck\InspiredDeck;
 
 trait CanFake
 {

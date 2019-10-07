@@ -27,7 +27,7 @@ class InspiredDeckAuthentication
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->session()->has($this->authentication->sessionKey)) {
+        if (!$this->authentication->isAuthenticated()) {
             throw new AuthenticationException(401);
         }
 

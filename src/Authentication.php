@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Session;
 use MBLSolutions\InspiredDeck\Authentication as InspiredDeckAuth;
 use MBLSolutions\InspiredDeck\Exceptions\AuthenticationException;
 use MBLSolutions\InspiredDeckLaravel\Exceptions\InvalidUserRoleException;
+use MBLSolutions\InspiredDeckLaravel\InspiredDeckAuth as AuthenticationInterface;
 
-class Authentication
+class Authentication implements AuthenticationInterface
 {
     /** @var string $key */
     public $sessionKey;
@@ -37,7 +38,7 @@ class Authentication
      *
      * @return mixed
      */
-    public function get()
+    public function get(): array
     {
         return Session::get($this->sessionKey, false);
     }
