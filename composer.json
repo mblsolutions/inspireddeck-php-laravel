@@ -16,7 +16,7 @@
         "illuminate/support": "~5.6.0|~5.7.0|~5.8.0|^6.0",
         "illuminate/session": "~5.6.0|~5.7.0|~5.8.0|^6.0",
         "illuminate/pagination": "~5.6.0|~5.7.0|~5.8.0|^6.0",
-        "mblsolutions/inspireddeck-php": "^1.1"
+        "mblsolutions/inspireddeck-php": "^1.2"
     },
     "require-dev": {
         "orchestra/testbench": "^4.0",
