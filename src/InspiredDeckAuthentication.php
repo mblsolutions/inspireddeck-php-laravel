@@ -67,11 +67,11 @@ class InspiredDeckAuthentication
     /**
      * Get the Users Brand
      *
-     * @return array
+     * @return array|null
      */
     public function getBrand(): ?array
     {
-        return $this->user['brand'];
+        return $this->user['brand'] ?? null;
     }
 
     /**

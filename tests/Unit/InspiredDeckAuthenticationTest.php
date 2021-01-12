@@ -159,7 +159,6 @@ class InspiredDeckAuthenticationTest extends LaravelTestCase
                 'user' => [
                     'name' => 'John Doe',
                     'role' => 'programme_manager',
-                    'brand' => null,
                 ],
             ]);
 
