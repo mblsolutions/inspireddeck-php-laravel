@@ -63,6 +63,10 @@ class Authentication implements AuthenticationInterface
             $password
         );
 
+        if (isset($response['api_version'])) {
+            Session::put('api_version', $response['api_version']);
+        }
+
         return $this->validateUserRole($response) && $this->store($response);
     }
 
