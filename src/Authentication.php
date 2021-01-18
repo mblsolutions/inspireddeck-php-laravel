@@ -137,11 +137,20 @@ class Authentication implements AuthenticationInterface
             'expires_in',
             'access_token',
             'refresh_token',
-            'user',
-            'api_version'
+            'user'
         ];
 
-        return $auth && array_keys($auth) === $matchingKeys;
+        if (!$auth) {
+            return false;
+        }
+
+        foreach ($matchingKeys as $key) {
+            if (!array_key_exists($key, $auth)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
