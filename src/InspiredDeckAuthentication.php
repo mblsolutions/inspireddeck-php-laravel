@@ -33,6 +33,18 @@ class InspiredDeckAuthentication
     }
 
     /**
+     * Returns display name including brand
+     *
+     * @return string|null
+     */
+    public function getDisplayName(): ?string
+    {
+        $brand = $this->getBrand();
+
+        return $brand ? $brand['name'].' | '.$this->getName() : $this->getName();
+    }
+
+    /**
      * Get the Users Email
      *
      * @return string
@@ -50,6 +62,16 @@ class InspiredDeckAuthentication
     public function getRole(): ?string
     {
         return $this->user['role'];
+    }
+
+    /**
+     * Get the Users Brand
+     *
+     * @return array|null
+     */
+    public function getBrand(): ?array
+    {
+        return $this->user['brand'] ?? null;
     }
 
     /**

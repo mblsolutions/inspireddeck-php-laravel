@@ -63,6 +63,10 @@ class Authentication implements AuthenticationInterface
             $password
         );
 
+        if (isset($response['api_version'])) {
+            Session::put('api_version', $response['api_version']);
+        }
+
         return $this->validateUserRole($response) && $this->store($response);
     }
 
@@ -133,7 +137,8 @@ class Authentication implements AuthenticationInterface
             'expires_in',
             'access_token',
             'refresh_token',
-            'user'
+            'user',
+            'api_version'
         ];
 
         return $auth && array_keys($auth) === $matchingKeys;

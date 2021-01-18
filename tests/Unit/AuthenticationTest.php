@@ -25,7 +25,8 @@ class AuthenticationTest extends LaravelTestCase
                      'name' => 'John Doe',
                      'email' => 'john.doe@example.com',
                      'role' => 'programme_manager'
-                 ]
+                 ],
+                 'api_version' => 'v1.0.0',
              ]);
 
         $authentication = new Authentication($stub);
@@ -47,7 +48,8 @@ class AuthenticationTest extends LaravelTestCase
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
                 'role' => 'programme_manager'
-            ]
+            ],
+            'api_version' => 'v1.0.0',
         ];
 
         $stub = $this->createMock(InspiredDeckAuthentication::class);
@@ -76,7 +78,8 @@ class AuthenticationTest extends LaravelTestCase
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
                 'role' => 'programme_manager'
-            ]
+            ],
+            'api_version' => 'v1.0.0',
         ];
 
         $stub = $this->createMock(InspiredDeckAuthentication::class);
@@ -105,7 +108,8 @@ class AuthenticationTest extends LaravelTestCase
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
                 'role' => 'store_operator'
-            ]
+            ],
+            'api_version' => 'v1.0.0',
         ];
 
         $stub = $this->createMock(InspiredDeckAuthentication::class);
@@ -130,7 +134,8 @@ class AuthenticationTest extends LaravelTestCase
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
                 'role' => 'programme_manager'
-            ]
+            ],
+            'api_version' => 'v1.0.0',
         ];
 
         session()->put('inspireddeck_auth_session', $response);
@@ -154,7 +159,8 @@ class AuthenticationTest extends LaravelTestCase
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
                 'role' => 'programme_manager'
-            ]
+            ],
+            'api_version' => 'v1.0.0',
         ];
 
         session()->put('inspireddeck_auth_session', $response);
@@ -177,6 +183,5 @@ class AuthenticationTest extends LaravelTestCase
 
         $this->assertFalse($authentication->isAuthenticated());
     }
-
 
 }
