@@ -38,7 +38,7 @@ class Authentication implements AuthenticationInterface
      *
      * @return mixed
      */
-    public function get(): array
+    public function get()
     {
         return Session::get($this->sessionKey, false);
     }

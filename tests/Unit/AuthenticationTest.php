@@ -37,6 +37,14 @@ class AuthenticationTest extends LaravelTestCase
     }
 
     /** @test **/
+    public function check_that_authentication_can_return_false(): void
+    {
+        $authentication = new Authentication();
+
+        $this->assertFalse($authentication->get());
+    }
+
+    /** @test **/
     public function login_stores_authentication_in_session(): void
     {
         $response = [
