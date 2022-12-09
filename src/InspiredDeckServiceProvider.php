@@ -2,7 +2,6 @@
 
 namespace MBLSolutions\InspiredDeckLaravel;
 
-use Exception;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -63,11 +62,11 @@ class InspiredDeckServiceProvider extends ServiceProvider
      * Inspired Deck Exception Handling
      *
      * @param $request
-     * @param Exception $exception
+     * @param $exception
      * @param callable|null $function
      * @return JsonResponse|RedirectResponse
      */
-    public static function exceptionHandling($request, Exception $exception, callable $function = null)
+    public static function exceptionHandling($request, $exception, callable $function = null)
     {
         if (route_contains('async') || route_contains('api')) {
             if ($exception instanceof ValidationException) {
