@@ -3,7 +3,6 @@
 namespace MBLSolutions\InspiredDeckLaravel;
 
 use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\ServiceProvider;
 use MBLSolutions\InspiredDeck\Exceptions\NotFoundException;
@@ -12,6 +11,7 @@ use MBLSolutions\InspiredDeck\Exceptions\ValidationException;
 use MBLSolutions\InspiredDeck\InspiredDeck;
 use MBLSolutions\InspiredDeckLaravel\Middleware\LoadInspiredDeckConfig;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Support\Facades\Response;
 
 class InspiredDeckServiceProvider extends ServiceProvider
 {
@@ -64,13 +64,13 @@ class InspiredDeckServiceProvider extends ServiceProvider
      * @param $request
      * @param $exception
      * @param callable|null $function
-     * @return JsonResponse|RedirectResponse
+     * @return \Illuminate\Http\JsonResponse|RedirectResponse
      */
     public static function exceptionHandling($request, $exception, callable $function = null)
     {
         if (route_contains('async') || route_contains('api')) {
             if ($exception instanceof ValidationException) {
-                return JsonResponse::create([
+                return Response::json([
                     'message' => $exception->getMessage(),
                     'errors' => $exception->getValidationErrors()
                 ], $exception->getCode());
