@@ -1,3 +1,7 @@
+## V2.2.0
+
++ Update composer.json dependencies for Laravel v10
+
 ## V2.1.0
 
 + Update outdated json error response
