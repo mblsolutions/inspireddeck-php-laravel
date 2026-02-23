@@ -1,3 +1,7 @@
+## V3.0.0
+
++ AB#113985 Update composer.json dependencies for Laravel v11, v12
+
 ## V2.2.0
 
 + Update composer.json dependencies for Laravel v10
