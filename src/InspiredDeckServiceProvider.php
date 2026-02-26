@@ -66,7 +66,7 @@ class InspiredDeckServiceProvider extends ServiceProvider
      * @param callable|null $function
      * @return \Illuminate\Http\JsonResponse|RedirectResponse
      */
-    public static function exceptionHandling($request, $exception, callable $function = null)
+    public static function exceptionHandling($request, $exception, ?callable $function = null)
     {
         if (route_contains('async') || route_contains('api')) {
             if ($exception instanceof ValidationException) {

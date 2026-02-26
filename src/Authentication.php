@@ -25,7 +25,7 @@ class Authentication implements AuthenticationInterface
      *
      * @param InspiredDeckAuth|null $authResource
      */
-    public function __construct(InspiredDeckAuth $authResource = null)
+    public function __construct(?InspiredDeckAuth $authResource = null)
     {
         $this->sessionKey = config('inspireddeck.session');
         $this->validRoles = config('inspireddeck.roles');
