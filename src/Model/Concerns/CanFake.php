@@ -41,7 +41,7 @@ trait CanFake
      * @param int $code
      * @param array|null $headers
      */
-    public function setFakeResponse(array $response, int $code = 200, array $headers = null)
+    public function setFakeResponse(array $response, int $code = 200, ?array $headers = null)
     {
         $this->mockedResponse = new Response(
             $code,

@@ -17,7 +17,7 @@
         "illuminate/support": "^9.0|^10|^11|^12",
         "illuminate/session": "^9.0|^10|^11|^12",
         "illuminate/pagination": "^9.0|^10|^11|^12",
-        "mblsolutions/inspireddeck-php": "^2.0"
+        "mblsolutions/inspireddeck-php": "^2.0.2"
     },
     "require-dev": {
         "orchestra/testbench": "^7.0",

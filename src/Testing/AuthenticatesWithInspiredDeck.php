@@ -13,7 +13,7 @@ trait AuthenticatesWithInspiredDeck
      * @param string|null $role
      * @return array
      */
-    protected function authenticateWithInspiredDeck(string $role = null): array
+    protected function authenticateWithInspiredDeck(?string $role = null): array
     {
         $key = $this->getInspiredDeckAuthentication()->sessionKey;
 

@@ -15,7 +15,7 @@ class InspiredDeckAuthentication
      *
      * @param InspiredDeckAuth $authentication
      */
-    public function __construct(InspiredDeckAuth $authentication = null)
+    public function __construct(?InspiredDeckAuth $authentication = null)
     {
         $this->authentication = $authentication ?: new Authentication;
 
