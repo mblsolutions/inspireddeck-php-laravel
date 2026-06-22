@@ -1,5 +1,9 @@
 ## V3.0.1
 
++ Bump mblsolutions/inspireddeck-php version
+
+## V3.0.1
+
 + AB#113985 Update for php8.4 compliance
 
 ## V3.0.0
