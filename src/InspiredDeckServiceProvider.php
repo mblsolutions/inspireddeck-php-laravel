@@ -4,7 +4,9 @@ namespace MBLSolutions\InspiredDeckLaravel;
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
+use MBLSolutions\InspiredDeck\Exceptions\AuthenticationException as ApiAuthenticationException;
 use MBLSolutions\InspiredDeck\Exceptions\NotFoundException;
 use MBLSolutions\InspiredDeck\Exceptions\PermissionDeniedException;
 use MBLSolutions\InspiredDeck\Exceptions\ValidationException;
@@ -81,6 +83,13 @@ class InspiredDeckServiceProvider extends ServiceProvider
             if ($exception->getStatusCode() === 401) {
                 return redirect()->route('login')->withErrors(['Please login to proceed.']);
             }
+        }
+
+        // The API token has ended or is no longer valid
+        if ($exception instanceof ApiAuthenticationException && $exception->getCode() === 401) {
+            Session::forget(config('inspireddeck.session'));
+
+            return redirect()->route('login')->withErrors(['Please login to proceed.']);
         }
 
         if ($exception instanceof PermissionDeniedException) {
