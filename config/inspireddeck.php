@@ -15,6 +15,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Inspired Deck Origin Verification
+    |--------------------------------------------------------------------------
+    |
+    | Sent as X-Origin-Verify on server-side API and OAuth requests.
+    | Supply the secret through the environment; never commit its value.
+    |
+    */
+
+    'origin_verify' => env('ID_ORIGIN_VERIFY'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Inspired Deck Verify SSL
     |--------------------------------------------------------------------------
     |

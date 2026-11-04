@@ -1,3 +1,7 @@
+## v3.0.3
++ Changes
+    + Load the environment-backed X-Origin-Verify header for all requests.
+
 ## V3.0.1
 
 + Bump mblsolutions/inspireddeck-php version
