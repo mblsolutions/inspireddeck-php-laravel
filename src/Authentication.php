@@ -60,7 +60,7 @@ class Authentication implements AuthenticationInterface
     {
         $this->recoveryCodes = [];
 
-        Session::regenerate();
+        Session::regenerate(true);
 
         $response = $this->authResource->password(
             config('inspireddeck.client_id'),

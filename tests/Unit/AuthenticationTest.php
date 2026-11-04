@@ -104,6 +104,25 @@ class AuthenticationTest extends LaravelTestCase
     }
 
     /** @test **/
+    public function login_destroys_the_old_session_record(): void
+    {
+        $session = session()->driver();
+        $session->put('pending_login', 'encrypted-value');
+        $session->save();
+
+        $oldId = $session->getId();
+        $this->assertStringContainsString('encrypted-value', $session->getHandler()->read($oldId));
+
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->method('password')->willReturn($this->tokenResponse());
+
+        (new Authentication($stub))->login('john.doe@example.com', 'password');
+
+        $this->assertNotSame($oldId, $session->getId());
+        $this->assertSame('', $session->getHandler()->read($oldId));
+    }
+
+    /** @test **/
     public function login_checks_for_valid_role(): void
     {
         $this->expectException(InvalidUserRoleException::class);
