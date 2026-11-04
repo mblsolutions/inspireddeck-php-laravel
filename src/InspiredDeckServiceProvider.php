@@ -4,6 +4,7 @@ namespace MBLSolutions\InspiredDeckLaravel;
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use MBLSolutions\InspiredDeck\Exceptions\NotFoundException;
 use MBLSolutions\InspiredDeck\Exceptions\PermissionDeniedException;
@@ -11,7 +12,6 @@ use MBLSolutions\InspiredDeck\Exceptions\ValidationException;
 use MBLSolutions\InspiredDeck\InspiredDeck;
 use MBLSolutions\InspiredDeckLaravel\Middleware\LoadInspiredDeckConfig;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Support\Facades\Response;
 
 class InspiredDeckServiceProvider extends ServiceProvider
 {
@@ -23,6 +23,8 @@ class InspiredDeckServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        InspiredDeck::setOriginVerify(config('inspireddeck.origin_verify'));
+
         $this->publishes([
             __DIR__ . '/../config/inspireddeck.php' => config_path('inspireddeck.php'),
         ], 'config');
