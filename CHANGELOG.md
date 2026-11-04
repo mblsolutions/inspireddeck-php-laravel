@@ -1,3 +1,12 @@
+## V3.1.0
+
++ AB#135116 2FA login steps and logout
++ login() takes optional otp or recovery_code; pullRecoveryCodes() returns new recovery codes once
++ login() destroys the old session record
++ logout() also ends the API token
++ A 401 from the API sends the user to the login page
++ Require mblsolutions/inspireddeck-php ^2.1.0
+
 ## V3.0.1
 
 + Bump mblsolutions/inspireddeck-php version
