@@ -62,6 +62,12 @@ $deckAuthentication->login('john.doe@example.com', 'password');
 
 Once authenticated, the authentication will be stored in the session key specified in the inspireddeck config.
 
+To send a two-factor code, pass `otp` or `recovery_code` as the optional 3rd argument:
+`$deckAuthentication->login('john.doe@example.com', 'password', ['otp' => '123456'])`.
+When a login returns new recovery codes, they are never stored in the session. Call `$deckAuthentication->pullRecoveryCodes()`
+on the same object right after `login()` (also after an `InvalidUserRoleException`) to get them once; it returns `[]` after that.
+`$deckAuthentication->logout()` also ends the API token.
+
 ### Checking authentication/Issuing Transactions
 
 ```php
