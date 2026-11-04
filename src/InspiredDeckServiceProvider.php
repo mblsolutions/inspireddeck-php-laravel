@@ -4,7 +4,10 @@ namespace MBLSolutions\InspiredDeckLaravel;
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
+use MBLSolutions\InspiredDeck\Exceptions\AuthenticationException as ApiAuthenticationException;
 use MBLSolutions\InspiredDeck\Exceptions\NotFoundException;
 use MBLSolutions\InspiredDeck\Exceptions\PermissionDeniedException;
 use MBLSolutions\InspiredDeck\Exceptions\ValidationException;
@@ -79,8 +82,15 @@ class InspiredDeckServiceProvider extends ServiceProvider
 
         if ($exception instanceof HttpException) {
             if ($exception->getStatusCode() === 401) {
-                return redirect()->route('login')->withErrors(['Please login to proceed.']);
+                return static::loginRequired($request);
             }
+        }
+
+        // The API token has ended or is no longer valid
+        if ($exception instanceof ApiAuthenticationException && $exception->getCode() === 401) {
+            Session::forget(config('inspireddeck.session'));
+
+            return static::loginRequired($request);
         }
 
         if ($exception instanceof PermissionDeniedException) {
@@ -96,6 +106,24 @@ class InspiredDeckServiceProvider extends ServiceProvider
         }
 
         return $function();
+    }
+
+    /**
+     * Send the user to the login page; JSON requests get a 401 with the login URL
+     *
+     * @param $request
+     * @return \Illuminate\Http\JsonResponse|RedirectResponse
+     */
+    protected static function loginRequired($request)
+    {
+        if ($request instanceof Request && $request->expectsJson()) {
+            return Response::json([
+                'message' => 'Please login to proceed.',
+                'redirect' => route('login'),
+            ], 401);
+        }
+
+        return redirect()->route('login')->withErrors(['Please login to proceed.']);
     }
 
 }

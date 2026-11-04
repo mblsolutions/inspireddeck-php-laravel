@@ -6,8 +6,10 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Session;
 use MBLSolutions\InspiredDeck\Authentication as InspiredDeckAuth;
 use MBLSolutions\InspiredDeck\Exceptions\AuthenticationException;
+use MBLSolutions\InspiredDeck\InspiredDeck;
 use MBLSolutions\InspiredDeckLaravel\Exceptions\InvalidUserRoleException;
 use MBLSolutions\InspiredDeckLaravel\InspiredDeckAuth as AuthenticationInterface;
+use Throwable;
 
 class Authentication implements AuthenticationInterface
 {
@@ -19,6 +21,9 @@ class Authentication implements AuthenticationInterface
 
     /** @var array $validRoles */
     protected $validRoles;
+
+    /** @var array $recoveryCodes */
+    protected $recoveryCodes = [];
 
     /**
      * Inspired Deck Authentication
@@ -48,20 +53,28 @@ class Authentication implements AuthenticationInterface
      *
      * @param string $username
      * @param string $password
+     * @param array $extra optional otp or recovery_code
      * @return bool
      * @throws GuzzleException
      * @throws AuthenticationException
      */
-    public function login($username, $password): bool
+    public function login($username, $password, array $extra = []): bool
     {
-        Session::regenerate();
+        $this->recoveryCodes = [];
+
+        Session::regenerate(true);
 
         $response = $this->authResource->password(
             config('inspireddeck.client_id'),
             config('inspireddeck.secret'),
             $username,
-            $password
+            $password,
+            $extra
         );
+
+        // Recovery codes are given to the caller once and never stored in the session
+        $this->recoveryCodes = is_array($response['recovery_codes'] ?? null) ? $response['recovery_codes'] : [];
+        unset($response['recovery_codes']);
 
         if (isset($response['api_version'])) {
             Session::put('api_version', $response['api_version']);
@@ -71,12 +84,38 @@ class Authentication implements AuthenticationInterface
     }
 
     /**
-     * Remove OAuth session
+     * Get the recovery codes from the last login, once
+     *
+     * @return array
+     */
+    public function pullRecoveryCodes(): array
+    {
+        $codes = $this->recoveryCodes;
+
+        $this->recoveryCodes = [];
+
+        return $codes;
+    }
+
+    /**
+     * End the API token and remove OAuth session
      *
      * @return bool
      */
     public function logout(): bool
     {
+        $auth = $this->get();
+
+        if (is_array($auth) && is_string($auth['access_token'] ?? null)) {
+            try {
+                InspiredDeck::setToken($auth['access_token']);
+
+                $this->authResource->logout();
+            } catch (Throwable $exception) {
+                // Best effort: the session is cleared either way
+            }
+        }
+
         Session::forget($this->sessionKey);
 
         return true;

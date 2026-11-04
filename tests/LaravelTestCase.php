@@ -3,6 +3,7 @@
 namespace MBLSolutions\InspiredDeckLaravel\Tests;
 
 use Illuminate\Foundation\Application;
+use MBLSolutions\InspiredDeck\InspiredDeck;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
 use MBLSolutions\Report\Tests\Fakes\Middleware\FakeMiddleware;
 
@@ -15,6 +16,9 @@ class LaravelTestCase extends \Orchestra\Testbench\TestCase
         parent::setUp();
 
         $this->setupEnvVariables();
+
+        // Never reach a real API from tests
+        InspiredDeck::setBaseUri('http://127.0.0.1:9');
     }
 
     /**
