@@ -3,6 +3,7 @@
 namespace MBLSolutions\InspiredDeckLaravel\Tests\Unit;
 
 use MBLSolutions\InspiredDeck\Authentication as InspiredDeckAuthentication;
+use MBLSolutions\InspiredDeck\Exceptions\AuthenticationException;
 use MBLSolutions\InspiredDeckLaravel\Authentication;
 use MBLSolutions\InspiredDeckLaravel\Exceptions\InvalidUserRoleException;
 use MBLSolutions\InspiredDeckLaravel\Tests\LaravelTestCase;
@@ -190,6 +191,190 @@ class AuthenticationTest extends LaravelTestCase
         $authentication = new Authentication();
 
         $this->assertFalse($authentication->isAuthenticated());
+    }
+
+    /** @test **/
+    public function login_without_extra_fields_passes_an_empty_array(): void
+    {
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+
+        $stub->expects($this->once())
+             ->method('password')
+             ->with(1, 'secret', 'john.doe@example.com', 'password', [])
+             ->willReturn($this->tokenResponse());
+
+        $this->assertTrue((new Authentication($stub))->login('john.doe@example.com', 'password'));
+    }
+
+    /** @test **/
+    public function login_passes_extra_fields_on(): void
+    {
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+
+        $stub->expects($this->once())
+             ->method('password')
+             ->with(1, 'secret', 'john.doe@example.com', 'password', ['otp' => '123456'])
+             ->willReturn($this->tokenResponse());
+
+        $this->assertTrue((new Authentication($stub))->login('john.doe@example.com', 'password', ['otp' => '123456']));
+    }
+
+    /** @test **/
+    public function recovery_codes_are_returned_once_and_never_stored_in_the_session(): void
+    {
+        $codes = $this->recoveryCodes();
+
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->method('password')->willReturn($this->tokenResponse(['recovery_codes' => $codes]));
+
+        $authentication = new Authentication($stub);
+
+        $this->assertTrue($authentication->login('john.doe@example.com', 'password', ['otp' => '123456']));
+
+        $this->assertEquals($this->tokenResponse(), session()->get('inspireddeck_auth_session'));
+        $this->assertSessionHasNoCodes($codes);
+
+        $this->assertSame($codes, $authentication->pullRecoveryCodes());
+        $this->assertSame([], $authentication->pullRecoveryCodes());
+    }
+
+    /** @test **/
+    public function login_without_recovery_codes_gives_none(): void
+    {
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->method('password')->willReturn($this->tokenResponse());
+
+        $authentication = new Authentication($stub);
+        $authentication->login('john.doe@example.com', 'password');
+
+        $this->assertSame([], $authentication->pullRecoveryCodes());
+    }
+
+    /** @test **/
+    public function recovery_codes_that_are_not_a_list_are_ignored(): void
+    {
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->method('password')->willReturn($this->tokenResponse(['recovery_codes' => 'abcde-12345']));
+
+        $authentication = new Authentication($stub);
+        $authentication->login('john.doe@example.com', 'password');
+
+        $this->assertSame([], $authentication->pullRecoveryCodes());
+        $this->assertEquals($this->tokenResponse(), session()->get('inspireddeck_auth_session'));
+        $this->assertSessionHasNoCodes(['abcde-12345']);
+    }
+
+    /** @test **/
+    public function recovery_codes_can_be_pulled_once_after_a_role_error(): void
+    {
+        $codes = $this->recoveryCodes();
+
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->method('password')->willReturn($this->tokenResponse(['recovery_codes' => $codes], 'store_operator'));
+
+        $authentication = new Authentication($stub);
+
+        try {
+            $authentication->login('john.doe@example.com', 'password', ['otp' => '123456']);
+            $this->fail('InvalidUserRoleException was not thrown');
+        } catch (InvalidUserRoleException $exception) {
+            // expected
+        }
+
+        $this->assertNull(session()->get('inspireddeck_auth_session'));
+        $this->assertSessionHasNoCodes($codes);
+        $this->assertSame($codes, $authentication->pullRecoveryCodes());
+        $this->assertSame([], $authentication->pullRecoveryCodes());
+    }
+
+    /** @test **/
+    public function failed_login_clears_recovery_codes_not_yet_pulled(): void
+    {
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->method('password')->will($this->onConsecutiveCalls(
+            $this->tokenResponse(['recovery_codes' => $this->recoveryCodes()]),
+            $this->throwException(new AuthenticationException('{"message":"Enter the code.","error":"two_factor_required"}', 422))
+        ));
+
+        $authentication = new Authentication($stub);
+        $authentication->login('john.doe@example.com', 'password', ['otp' => '123456']);
+
+        try {
+            $authentication->login('john.doe@example.com', 'password');
+            $this->fail('AuthenticationException was not thrown');
+        } catch (AuthenticationException $exception) {
+            // expected
+        }
+
+        $this->assertSame([], $authentication->pullRecoveryCodes());
+    }
+
+    /** @test **/
+    public function second_login_clears_recovery_codes_not_yet_pulled(): void
+    {
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->method('password')->will($this->onConsecutiveCalls(
+            $this->tokenResponse(['recovery_codes' => $this->recoveryCodes()]),
+            $this->tokenResponse()
+        ));
+
+        $authentication = new Authentication($stub);
+        $authentication->login('john.doe@example.com', 'password', ['otp' => '123456']);
+        $authentication->login('john.doe@example.com', 'password');
+
+        $this->assertSame([], $authentication->pullRecoveryCodes());
+    }
+
+    /**
+     * A successful token response
+     *
+     * @param array $extra
+     * @param string $role
+     * @return array
+     */
+    private function tokenResponse(array $extra = [], string $role = 'programme_manager'): array
+    {
+        return array_merge([
+            'token_type' => 'Bearer',
+            'expires_in' => 31622400,
+            'access_token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjBmOGMwNDAxZDAy',
+            'refresh_token' => 'def5020002eca9ac7875d5d800c195024d7fb702535c0d30a0',
+            'user' => [
+                'name' => 'John Doe',
+                'email' => 'john.doe@example.com',
+                'role' => $role
+            ],
+            'api_version' => 'v1.0.0',
+        ], $extra);
+    }
+
+    /**
+     * Eight recovery codes
+     *
+     * @return array
+     */
+    private function recoveryCodes(): array
+    {
+        return [
+            'a1b2c-d3e4f', 'g5h6i-j7k8l', 'm9n0o-p1q2r', 's3t4u-v5w6x',
+            'y7z8a-b9c0d', 'e1f2g-h3i4j', 'k5l6m-n7o8p', 'q9r0s-t1u2v',
+        ];
+    }
+
+    /**
+     * Assert that no recovery code is anywhere in the session
+     *
+     * @param array $codes
+     */
+    private function assertSessionHasNoCodes(array $codes): void
+    {
+        $session = serialize(session()->all());
+
+        $this->assertStringNotContainsString('recovery_codes', $session);
+
+        foreach ($codes as $code) {
+            $this->assertStringNotContainsString($code, $session);
+        }
     }
 
 }
