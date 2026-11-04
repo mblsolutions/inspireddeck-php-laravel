@@ -4,7 +4,7 @@
 + login() takes optional otp or recovery_code; pullRecoveryCodes() returns new recovery codes once
 + login() destroys the old session record
 + logout() also ends the API token
-+ A 401 from the API sends the user to the login page
++ A 401 from the API sends the user to the login page; JSON requests get a 401 with the login URL
 + Require mblsolutions/inspireddeck-php ^2.1.0
 
 ## V3.0.1
