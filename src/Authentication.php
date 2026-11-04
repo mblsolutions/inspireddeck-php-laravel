@@ -6,8 +6,10 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Session;
 use MBLSolutions\InspiredDeck\Authentication as InspiredDeckAuth;
 use MBLSolutions\InspiredDeck\Exceptions\AuthenticationException;
+use MBLSolutions\InspiredDeck\InspiredDeck;
 use MBLSolutions\InspiredDeckLaravel\Exceptions\InvalidUserRoleException;
 use MBLSolutions\InspiredDeckLaravel\InspiredDeckAuth as AuthenticationInterface;
+use Throwable;
 
 class Authentication implements AuthenticationInterface
 {
@@ -96,12 +98,24 @@ class Authentication implements AuthenticationInterface
     }
 
     /**
-     * Remove OAuth session
+     * End the API token and remove OAuth session
      *
      * @return bool
      */
     public function logout(): bool
     {
+        $auth = $this->get();
+
+        if (is_array($auth) && is_string($auth['access_token'] ?? null)) {
+            try {
+                InspiredDeck::setToken($auth['access_token']);
+
+                $this->authResource->logout();
+            } catch (Throwable $exception) {
+                // Best effort: the session is cleared either way
+            }
+        }
+
         Session::forget($this->sessionKey);
 
         return true;

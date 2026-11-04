@@ -2,8 +2,12 @@
 
 namespace MBLSolutions\InspiredDeckLaravel\Tests\Unit;
 
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Psr7\Request;
 use MBLSolutions\InspiredDeck\Authentication as InspiredDeckAuthentication;
 use MBLSolutions\InspiredDeck\Exceptions\AuthenticationException;
+use MBLSolutions\InspiredDeck\InspiredDeck;
+use TypeError;
 use MBLSolutions\InspiredDeckLaravel\Authentication;
 use MBLSolutions\InspiredDeckLaravel\Exceptions\InvalidUserRoleException;
 use MBLSolutions\InspiredDeckLaravel\Tests\LaravelTestCase;
@@ -168,7 +172,7 @@ class AuthenticationTest extends LaravelTestCase
 
         session()->put('inspireddeck_auth_session', $response);
 
-        $authentication = new Authentication();
+        $authentication = new Authentication($this->createMock(InspiredDeckAuthentication::class));
 
         $authentication->logout();
 
@@ -342,6 +346,72 @@ class AuthenticationTest extends LaravelTestCase
         $authentication->login('john.doe@example.com', 'password');
 
         $this->assertSame([], $authentication->pullRecoveryCodes());
+    }
+
+    /** @test **/
+    public function logout_ends_the_api_token_then_clears_the_session(): void
+    {
+        InspiredDeck::setToken('another-token');
+        session()->put('inspireddeck_auth_session', $this->tokenResponse());
+
+        $calls = [];
+
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->expects($this->once())
+             ->method('logout')
+             ->willReturnCallback(function () use (&$calls) {
+                 // Only record here: logout() catches everything, including failed asserts
+                 $calls[] = [
+                     'token' => InspiredDeck::getToken(),
+                     'session' => session()->has('inspireddeck_auth_session'),
+                 ];
+
+                 return ['message' => 'Logged out'];
+             });
+
+        $this->assertTrue((new Authentication($stub))->logout());
+
+        $this->assertSame([[
+            'token' => $this->tokenResponse()['access_token'],
+            'session' => true,
+        ]], $calls);
+        $this->assertNull(session()->get('inspireddeck_auth_session'));
+    }
+
+    /** @test **/
+    public function logout_ignores_errors_from_the_api(): void
+    {
+        $errors = [
+            new AuthenticationException('{"message":"Unauthenticated."}', 401),
+            new ConnectException('Connection refused', new Request('POST', '/api/logout')),
+            new TypeError('Unexpected response'),
+        ];
+
+        foreach ($errors as $error) {
+            session()->put('inspireddeck_auth_session', $this->tokenResponse());
+
+            $stub = $this->createMock(InspiredDeckAuthentication::class);
+            $stub->expects($this->once())->method('logout')->willThrowException($error);
+
+            $this->assertTrue((new Authentication($stub))->logout());
+            $this->assertNull(session()->get('inspireddeck_auth_session'));
+        }
+    }
+
+    /** @test **/
+    public function logout_without_a_token_makes_no_api_call(): void
+    {
+        $stub = $this->createMock(InspiredDeckAuthentication::class);
+        $stub->expects($this->never())->method('logout');
+
+        $authentication = new Authentication($stub);
+
+        $this->assertTrue($authentication->logout());
+
+        session()->put('inspireddeck_auth_session', ['user' => ['role' => 'admin']]);
+
+        $this->assertTrue($authentication->logout());
+        $this->assertNull(session()->get('inspireddeck_auth_session'));
     }
 
     /**
